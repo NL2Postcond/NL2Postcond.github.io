@@ -6,7 +6,7 @@
     <meta name="description" content="NL2Post">
     <meta name="keywords" content="Nl2Postcondition">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Nerfies: Deformable Neural Radiance Fields</title>
+    <title>Can LLMs Transform NL Intent into Formal Postconditions?</title>
 
     <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
 
@@ -27,7 +27,7 @@
 
 <body>
     <div class="banner">
-        🎉 NL2Post has been accepted to FSE 2024
+        🎉 This work has been accepted to FSE 2024!
     </div>
 
     <section class="hero">
@@ -105,7 +105,7 @@
     </section>
 
 
-
+ 
 
 
 
@@ -117,207 +117,106 @@
                     <h2 class="title is-3">Abstract</h2>
                     <div class="content has-text-justified">
                         <p>
-                            We present the first method capable of photorealistically reconstructing a non-rigidly
-                            deforming scene using photos/videos captured casually from mobile phones.
+                            Informal natural language that describes code functionality, such as code comments or function documentation,
+                            may contain substantial information about a program’s intent. However, there is typically no guarantee that a
+                            program’s implementation and natural language documentation are aligned. In the case of a conflict, leveraging
+                            information in code-adjacent natural language has the potential to enhance fault localization, debugging,
+                            and code trustworthiness. In practice, however, this information is often underutilized due to the inherent
+                            ambiguity of natural language which makes natural language intent challenging to check programmatically.
+                            The “emergent abilities” of Large Language Models (LLMs) have the potential to facilitate the translation of
+                            natural language intent to programmatically checkable assertions. However, it is unclear if LLMs can correctly
+                            translate informal natural language specifications into formal specifications that match programmer intent.
+                            Additionally, it is unclear if such translation could be useful in practice.
                         </p>
                         <p>
-                            Our approach augments neural radiance fields
-                            (NeRF) by optimizing an
-                            additional continuous volumetric deformation field that warps each observed point into a
-                            canonical 5D NeRF.
-                            We observe that these NeRF-like deformation fields are prone to local minima, and
-                            propose a coarse-to-fine optimization method for coordinate-based models that allows for
-                            more robust optimization.
-                            By adapting principles from geometry processing and physical simulation to NeRF-like
-                            models, we propose an elastic regularization of the deformation field that further
-                            improves robustness.
+                            In this paper, we describe nl2postcond, the problem of leveraging LLMs for transforming informal natural
+                            language to formal method postconditions, expressed as program assertions. We introduce and validate metrics
+                            to measure and compare different nl2postcond approaches, using the correctness and discriminative power of
+                            generated postconditions. We then use qualitative and quantitative methods to assess the quality of nl2postcond
+                            postconditions, finding that they are generally correct and able to discriminate incorrect code. Finally, we find
+                            that nl2postcond via LLMs has the potential to be helpful in practice; nl2postcond generated postconditions
+                            were able to catch 64 real-world historical bugs from Defects4J
                         </p>
-                        <p>
-                            We show that <span class="dnerf">Nerfies</span> can turn casually captured selfie
-                            photos/videos into deformable NeRF
-                            models that allow for photorealistic renderings of the subject from arbitrary
-                            viewpoints, which we dub <i>"nerfies"</i>. We evaluate our method by collecting data
-                            using a
-                            rig with two mobile phones that take time-synchronized photos, yielding train/validation
-                            images of the same pose at different viewpoints. We show that our method faithfully
-                            reconstructs non-rigidly deforming scenes and reproduces unseen views with high
-                            fidelity.
-                        </p>
+                       
                     </div>
                 </div>
             </div>
             <!--/ Abstract. -->
 
-            <!-- Paper video. -->
-            <div class="columns is-centered has-text-centered">
-                <div class="column is-four-fifths">
-                    <h2 class="title is-3">Video</h2>
-                    <div class="publication-video">
-                        <iframe src="https://www.youtube.com/embed/MrKrnHhk8IA?rel=0&amp;showinfo=0" frameborder="0"
-                            allow="autoplay; encrypted-media" allowfullscreen></iframe>
-                    </div>
-                </div>
-            </div>
-            <!--/ Paper video. -->
-        </div>
+      
     </section>
+
+    <section class="section">
+        <div class="container is-max-desktop">
+          <div class="columns is-centered has-text-centered">
+            <div class="column is-four-fifths">
+              <h2 class="title is-3">Postconditions Help Formalize Ambiguous User Intent </h2>
+              <div class="content has-text-justified">
+
+                <img src="./static/images/post.png" alt="postcondition" class="teaser-image center" width="100%" />
+                <p class="subtitle has-text-justified">
+                    Example of how postconditions could be used to clarify ambiguous natural language specifications
+                </p>  
+                <p>
+                    Natural language specifications, often writen by users when interacting with an LLM via a prompt, are often ambiguous.  Consider the exampe above, taken from the popular Python code generation benchmark, HumanEval. A programmer intends a function that removes all numbers with duplicates from a list. For example, given the list [1,2,3,2,4] the function should return [1,3,4] without the element 2 because it appears more than once. The programmer describes the function specification in a docstring. However, this natural language specification is ambiguous; it does not indicate if all copies of the duplicated elements should be removed, or if one copy should be retained. In this case, the programmer intends the former, however, it is not uncommon to expect that the program should fulfill the latter.
+                    Figure (c) contains two postconditions, each satisfying one of the two possible intents of the ambiguous docstring. The programmer writing the remove_duplicates function can verify that the second postcondition "assert all(numbers.count(i)==1 for i in return_list)” correctly matches their intent, by ensuring that all numbers in the returned list occur exactly once in the input list. The first postcondition, however, incorrectly asserts that return_list is a set of the input list numbers. In this example from HumanEval, it is not immediately clear at first glance what the user intent is. Generating such postconditions from natural language allows for checkable and unambiguous statements about a program’s intended behavior, formalizing a user’s intent about a program.
+    
+                </p>
+
+            </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
 
     <section class="section">
         <div class="container is-max-desktop">
+          <div class="columns is-centered has-text-centered">
+            <div class="column is-four-fifths">
+              <h2 class="title is-3">Postconditions Can Catch Bugs in Real-World Programs</h2>
+              <div class="content has-text-justified">
+                <img src="./static/images/bug.png" alt="postcondition" class="teaser-image center" width="100%" />
+                <p class="subtitle has-text-justified">
+                    Example of how postconditions or other formal specifications of program behavior could catch bugs. This example is a historical bug from Defects4J (Math-9): the Line constructor does not return a new line with enough precision. The postconditions were generated by GPT-4 in our evaluation, and both catch the bug.
+                </p>  
+                <p>
+                    In practice, postconditions generated in the target programming language can be used in assertions, as demonstrated in fig. 1c, to check the correctness of a function, enabling the early detection of bugs or violations of a programmer’s intent.
+The example in the figure above shows how formal specifications can be used to catch bugs in real-world programs. A bug from the Apache Commons Math project, the function revert() calls a constructor Line() that should return a new Line object with a reversed direction. The bug report 1 associated with the issue explains that revert() does not maintain enough precision, and fails in certain scenarios. Both of the provided postconditions in Figure c catch the bug by leveraging project-specific context and general mathematical knowledge about the specifications of a reversed line.
+                </p>
 
-            <div class="columns is-centered">
-
-                <!-- Visual Effects. -->
-                <div class="column">
-                    <div class="content">
-                        <h2 class="title is-3">Visual Effects</h2>
-                        <p>
-                            Using <i>nerfies</i> you can create fun visual effects. This Dolly zoom effect
-                            would be impossible without nerfies since it would require going through a wall.
-                        </p>
-                        <video id="dollyzoom" autoplay controls muted loop playsinline height="100%">
-                            <source src="./static/videos/dollyzoom-stacked.mp4" type="video/mp4">
-                        </video>
-                    </div>
-                </div>
-                <!--/ Visual Effects. -->
-
-                <!-- Matting. -->
-                <div class="column">
-                    <h2 class="title is-3">Matting</h2>
-                    <div class="columns is-centered">
-                        <div class="column content">
-                            <p>
-                                As a byproduct of our method, we can also solve the matting problem by ignoring
-                                samples that fall outside of a bounding box during rendering.
-                            </p>
-                            <video id="matting-video" controls playsinline height="100%">
-                                <source src="./static/videos/matting.mp4" type="video/mp4">
-                            </video>
-                        </div>
-
-                    </div>
-                </div>
+               
             </div>
-            <!--/ Matting. -->
-
-            <!-- Animation. -->
-            <div class="columns is-centered">
-                <div class="column is-full-width">
-                    <h2 class="title is-3">Animation</h2>
-
-                    <!-- Interpolating. -->
-                    <h3 class="title is-4">Interpolating states</h3>
-                    <div class="content has-text-justified">
-                        <p>
-                            We can also animate the scene by interpolating the deformation latent codes of two input
-                            frames. Use the slider here to linearly interpolate between the left frame and the right
-                            frame.
-                        </p>
-                    </div>
-                    <div class="columns is-vcentered interpolation-panel">
-                        <div class="column is-3 has-text-centered">
-                            <img src="./static/images/interpolate_start.jpg" class="interpolation-image"
-                                alt="Interpolate start reference image." />
-                            <p>Start Frame</p>
-                        </div>
-                        <div class="column interpolation-video-column">
-                            <div id="interpolation-image-wrapper">
-                                Loading...
-                            </div>
-                            <input class="slider is-fullwidth is-large is-info" id="interpolation-slider" step="1"
-                                min="0" max="100" value="0" type="range">
-                        </div>
-                        <div class="column is-3 has-text-centered">
-                            <img src="./static/images/interpolate_end.jpg" class="interpolation-image"
-                                alt="Interpolation end reference image." />
-                            <p class="is-bold">End Frame</p>
-                        </div>
-                    </div>
-                    <br />
-                    <!--/ Interpolating. -->
-
-                    <!-- Re-rendering. -->
-                    <h3 class="title is-4">Re-rendering the input video</h3>
-                    <div class="content has-text-justified">
-                        <p>
-                            Using <span class="dnerf">Nerfies</span>, you can re-render a video from a novel
-                            viewpoint such as a stabilized camera by playing back the training deformations.
-                        </p>
-                    </div>
-                    <div class="content has-text-centered">
-                        <video id="replay-video" controls muted preload playsinline width="75%">
-                            <source src="./static/videos/replay.mp4" type="video/mp4">
-                        </video>
-                    </div>
-                    <!--/ Re-rendering. -->
-
-                </div>
             </div>
-            <!--/ Animation. -->
-
-
-            <!-- Concurrent Work. -->
-            <div class="columns is-centered">
-                <div class="column is-full-width">
-                    <h2 class="title is-3">Related Links</h2>
-
-                    <div class="content has-text-justified">
-                        <p>
-                            There's a lot of excellent work that was introduced around the same time as ours.
-                        </p>
-                        <p>
-                            <a href="https://arxiv.org/abs/2104.09125">Progressive Encoding for Neural Optimization</a>
-                            introduces an idea similar to our windowed position encoding for coarse-to-fine
-                            optimization.
-                        </p>
-                        <p>
-                            <a href="https://www.albertpumarola.com/research/D-NeRF/index.html">D-NeRF</a> and <a
-                                href="https://gvv.mpi-inf.mpg.de/projects/nonrigid_nerf/">NR-NeRF</a>
-                            both use deformation fields to model non-rigid scenes.
-                        </p>
-                        <p>
-                            Some works model videos with a NeRF by directly modulating the density, such as <a
-                                href="https://video-nerf.github.io/">Video-NeRF</a>, <a
-                                href="https://www.cs.cornell.edu/~zl548/NSFF/">NSFF</a>, and <a
-                                href="https://neural-3d-video.github.io/">DyNeRF</a>
-                        </p>
-                        <p>
-                            There are probably many more by the time you are reading this. Check out <a
-                                href="https://dellaert.github.io/NeRF/">Frank Dellart's survey on recent NeRF
-                                papers</a>, and <a href="https://github.com/yenchenlin/awesome-NeRF">Yen-Chen Lin's
-                                curated list of NeRF papers</a>.
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <!--/ Concurrent Work. -->
-
+          </div>
         </div>
-    </section>
+      </section>
 
 
-    <section class="section" id="BibTeX">
+  
+      <section class="section" id="BibTeX">
         <div class="container is-max-desktop content">
-            <h2 class="title">BibTeX</h2>
-            <pre><code>@article{park2021nerfies,
-  author    = {Park, Keunhong and Sinha, Utkarsh and Barron, Jonathan T. and Bouaziz, Sofien and Goldman, Dan B and Seitz, Steven M. and Martin-Brualla, Ricardo},
-  title     = {Nerfies: Deformable Neural Radiance Fields},
-  journal   = {ICCV},
-  year      = {2021},
-}</code></pre>
+          <h2 class="title">BibTeX</h2>
+          <pre style="background-color:black; border-radius: 10px;"><code style="color:white;">@inproceedings{
+        endres2024NLPost,
+        title={Can Large Language Models Transform Natural Language Intent into Formal Method Postconditions?},
+        author={Madeline Endres and Sarah Fakhoury and Saikat Chakraborty and Shuvendu K. Lahiri},
+        booktitle={In Proceedings of the ACM on Software Engineering (FSE)},
+        volume={1}
+        year={2024}
+    }</code></pre>
         </div>
-    </section>
+      </section>
+
 
 
     <footer class="footer">
         <div class="container">
             <div class="content has-text-centered">
-                <a class="icon-link" href="./static/videos/nerfies_paper.pdf">
+                <a class="icon-link" href="https://arxiv.org/pdf/2310.01831">
                     <i class="fas fa-file-pdf"></i>
                 </a>
-                <a class="icon-link" href="https://github.com/keunhong" class="external-link" disabled>
+                <a class="icon-link" href="" class="external-link" disabled>
                     <i class="fab fa-github"></i>
                 </a>
             </div>
@@ -325,16 +224,8 @@
                 <div class="column is-8">
                     <div class="content">
                         <p>
-                            This website is licensed under a <a rel="license"
-                                href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
-                                Commons Attribution-ShareAlike 4.0 International License</a>.
-                        </p>
-                        <p>
-                            This means you are free to borrow the <a
-                                href="https://github.com/nerfies/nerfies.github.io">source code</a> of this website,
-                            we just ask that you link back to this page in the footer.
-                            Please remember to remove the analytics code included in the header of the website which
-                            you do not want on your website.
+                             <a
+                                href="https://github.com/nerfies/nerfies.github.io">Site Template</a> 
                         </p>
                     </div>
                 </div>
